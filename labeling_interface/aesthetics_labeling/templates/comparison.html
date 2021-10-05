@@ -1,0 +1,54 @@
+{% load static %}
+
+<head>
+	<link rel="stylesheet" href="{% static 'css/comparison.css' %}">
+	<script src="{% static 'js/comparison.js' %}"></script> 
+</head>
+<body>
+	<p>Welcome to Sam's Computational Aesthetics Labeling Interface!</p>
+
+	<p>Progress: {{n_completed}}/{{n_total}} --- {{percentage}}%. Choose which image you enjoy more, or another option if it is difficult to decide.</p>
+
+    <form id="main_form" method="post">
+        {% csrf_token %}
+    	<div class="row">
+    		<div class="column">
+                {% load static %}
+    			<img class="center" src="{{image_a_path}}"/>
+    			<p>Image A:</p>
+                <input type="checkbox" name="image_a_broken" value="image_a_broken">Broken<br>
+    		</div>
+    		<div class="column">
+    			<img class="center" src="{{image_b_path}}"/>
+    			<p>Image B:</p>
+                <input type="checkbox" name="image_a_broken" value="image_a_broken">Broken<br>
+    		</div>
+    	</div>
+    	<div class="row">
+    		<div class="column">
+    			<button type="button" class="center" id='left_button' onclick="submitForm({{Comparison.A_BETTER}});">Left (press a)</button>
+    		</div>
+    		<div class="column">
+    			<button type="button" class="center" id='right_button' onclick="submitForm({{Comparison.B_BETTER}});">Right(press b)</button>
+    		</div>
+    	</div>
+    	<div class="row">
+    		<div class="column">
+    			<button type="button" class="center" id='similar_button' onclick="submitForm({{Comparison.SIMILAR_GOOD}});">I enjoy both of these images (press s)</button>
+    		</div>
+            <div class="column">
+                <button type="button" class="center" id='similar_button' onclick="submitForm({{Comparison.SIMILAR_BAD}});">I do not enjoy either of these images (press d)</button>
+            </div>
+    		<div class="column">
+    			<button type="button" class="center" id='different_button' onclick="submitForm({{Comparison.DIFFERENT}});">These images are too different (press f)</button>
+    		</div>
+    		</div>
+    	</div>
+        <div class="row">
+            <p>To what extent do these images have different (left) or similar (right) style?</p>
+            <div class="slidecontainer">
+              <input type="range" min="1" max="100" value="50" class="slider" name="similarity">
+            </div>
+        <input type="hidden" id="comparison_result" name="comparison_result" value="0">
+    </form>
+</body>

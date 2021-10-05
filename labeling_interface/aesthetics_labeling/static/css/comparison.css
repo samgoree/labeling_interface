@@ -1,0 +1,24 @@
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+img.center {
+  height: 500px;
+  width: auto;
+}
+
+.row {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.column {
+  flex: 50%;
+  text-align: center;
+}
+.half-column {
+  flex: 25%;
+  text-align: center;
+}

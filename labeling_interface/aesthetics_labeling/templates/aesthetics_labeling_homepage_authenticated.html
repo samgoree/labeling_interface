@@ -1,0 +1,11 @@
+<p>Welcome to the Computational Aesthetics Labeling Interface!</p>
+
+<p>Logged in as {{user.get_username }}. <a href="~sgoree/django.cgi/accounts/logout/"
+
+{% if most_recent_question %}
+<p><a href="~sgoree/django.cgi/aesthetics_labeling/{{ most_recent_question.id }}/">Continue</a></p>
+{% else %}
+<p>You're all done!</p>
+{% endif %}
+
+<p>

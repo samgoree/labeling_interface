@@ -1,0 +1,47 @@
+<h1>Aesthetic Preference Survey</h1>
+<p>Thank you for participating in our research study! We are collecting data on human aesthetic preferences for photographs. First, we will ask you a series of six demographic questions, followed by a series of 100 questions about pairs of images. This survey will take between 30 and 90 minutes to complete. Upon completion, we will email you a link to a $15 Amazon gift card to compensate you for your time.</p>
+<form method="POST">
+    {% csrf_token %}
+    <p>
+        <label for="email">Please provide your email address so that we can send you your gift card: </label><input type="text" id="email" name="email" required> (required) <br>
+    </p>
+    <p>
+        <label for="age">What is your age? (required)</label><br>
+        <input type="radio" name="age" id="Under 18" value=1 required><label for="Under 18">Under 18</label><br>
+        <input type="radio" name="age" id="18-24" value=2><label for="18-24">18-24</label><br>
+        <input type="radio" name="age" id="25-34" value=3><label for="25-34">25-34</label><br>
+        <input type="radio" name="age" id="35-44" value=4><label for="35-44">35-44</label><br>
+        <input type="radio" name="age" id="45-54" value=5><label for="45-54">45-54</label><br>
+        <input type="radio" name="age" id="55 or Over" value=6><label for="55 or Over">55 or Over</label><br>
+    </p><p>
+        <label for="gender">What is your gender?</label><br>
+        <input type="radio" name="gender" id="Man" value="Man"><label for="Man">Man</label><br>
+        <input type="radio" name="gender" id="Woman" value="Woman"><label for="Woman">Woman</label><br>
+        <input type="radio" name="gender" id="na" value=""><label for="na">Choose not to specify</label><br>
+        <input type="radio" name="gender" id="Other" value="Other"><label for="Other">Other (please specify): </label><input type="text" id="gender" name="other"><br>
+    </p><p>
+        <label for="race">How would you describe your race? (choose one or more)</label><br>
+        <input type="checkbox" name="race" id="native" value="American Indian or Alaska Native"><label for="native">American Indian or Alaska Native</label><br>
+        <input type="checkbox" name="race" id="asian" value="Asian"><label for="asian">Asian</label><br>
+        <input type="checkbox" name="race" id="black" value="Black or African American"><label for="black">Black or African American</label><br>
+        <input type="checkbox" name="race" id="nhpi" value="Native Hawaiian or Other Pacific Islander"><label for="nhpi">Native Hawaiian or Other Pacific Islander</label><br>
+        <input type="checkbox" name="race" id="white" value="White"><label for="white">White</label><br>
+        <input type="checkbox" name="race" id="na" value=""><label for="na">Choose not to specify</label><br>
+        <input type="checkbox" name="race" id="other" value="Other"><label for="other">Other (please specify): </label><input type="text" id="race" name="other"><br>
+    </p><p>
+        <label for="education">What is your highest level of formal education?</label><br>
+        <input type="radio" name="education" id="na" value="0"><label for="na">Choose not to specify</label><br>
+        <input type="radio" name="education" id="edu_1" value="Less than a high school diploma"><label for="edu_1">Less than a high school diploma</label><br>
+        <input type="radio" name="education" id="edu_2" value="High school degree or equivalent (e.g. GED)"><label for="edu_2">High school degree or equivalent (e.g. GED)</label><br>
+        <input type="radio" name="education" id="edu_3" value="Some college, no degree"><label for="edu_3">Some college, no degree</label><br>
+        <input type="radio" name="education" id="edu_4" value="Associate degree (e.g. AA, AS)"><label for="edu_4">Associate degree (e.g. AA, AS)</label><br>
+        <input type="radio" name="education" id="edu_5" value="Bachelor’s degree (e.g. BA, BS)"><label for="edu_5">Bachelor’s degree (e.g. BA, BS)</label><br>
+        <input type="radio" name="education" id="edu_6" value="Master’s degree (e.g. MA, MS, MEd)"><label for="edu_6">Master’s degree (e.g. MA, MS, MEd)</label><br>
+        <input type="radio" name="education" id="edu_7" value="Professional degree (e.g. MD, DDS, DVM)"><label for="edu_7">Professional degree (e.g. MD, DDS, DVM)</label><br>
+        <input type="radio" name="education" id="edu_8" value="Doctorate (e.g. PhD, EdD)"><label for="edu_8">Doctorate (e.g. PhD, EdD)</label><br>
+    </p><p>
+        <label for="language">What is the first language you learned to speak? (leave blank if you choose not to specify)</label><br>
+        <input type="text" id="language" name="language"><br>
+    </p>
+    <input type="submit" value="Submit">
+</form>
