@@ -1,10 +1,17 @@
 <h1>Aesthetic Preference Survey</h1>
 <p>Thank you for participating in our research study! We are collecting data on human aesthetic preferences for photographs. First, we will ask you a series of six demographic questions, followed by a series of 100 questions about pairs of images. This survey will take between 30 and 90 minutes to complete. Upon completion, we will email you a link to a $15 Amazon gift card to compensate you for your time.</p>
-<form method="POST">
+<form method="POST" onsubmit="document.getElementById('working').style.display = 'inline';">
     {% csrf_token %}
-    <p>
-        <label for="email">Please provide your email address so that we can send you your gift card: </label><input type="text" id="email" name="email" required> (required) <br>
+    {% if not user.is_authenticated %}
+    <p> <label for="email">Please provide your email address so that we can send you your gift card: </label>
+        <input type="text" id="email" name="email" required> (required) <br>
     </p>
+    <p> <label for="password">Please create a password so you can log in and continue if you leave.</label>
+        <input type="password" id="password" name="password" required> (required) <br>
+    </p>
+    {% else %}
+    <p>Resubmitting information for {{user.email}}</p>
+    {% endif %}
     <p>
         <label for="age">What is your age? (required)</label><br>
         <input type="radio" name="age" id="Under 18" value=1 required><label for="Under 18">Under 18</label><br>
@@ -31,17 +38,19 @@
     </p><p>
         <label for="education">What is your highest level of formal education?</label><br>
         <input type="radio" name="education" id="na" value="0"><label for="na">Choose not to specify</label><br>
-        <input type="radio" name="education" id="edu_1" value="Less than a high school diploma"><label for="edu_1">Less than a high school diploma</label><br>
-        <input type="radio" name="education" id="edu_2" value="High school degree or equivalent (e.g. GED)"><label for="edu_2">High school degree or equivalent (e.g. GED)</label><br>
-        <input type="radio" name="education" id="edu_3" value="Some college, no degree"><label for="edu_3">Some college, no degree</label><br>
-        <input type="radio" name="education" id="edu_4" value="Associate degree (e.g. AA, AS)"><label for="edu_4">Associate degree (e.g. AA, AS)</label><br>
-        <input type="radio" name="education" id="edu_5" value="Bachelor’s degree (e.g. BA, BS)"><label for="edu_5">Bachelor’s degree (e.g. BA, BS)</label><br>
-        <input type="radio" name="education" id="edu_6" value="Master’s degree (e.g. MA, MS, MEd)"><label for="edu_6">Master’s degree (e.g. MA, MS, MEd)</label><br>
-        <input type="radio" name="education" id="edu_7" value="Professional degree (e.g. MD, DDS, DVM)"><label for="edu_7">Professional degree (e.g. MD, DDS, DVM)</label><br>
-        <input type="radio" name="education" id="edu_8" value="Doctorate (e.g. PhD, EdD)"><label for="edu_8">Doctorate (e.g. PhD, EdD)</label><br>
+        <input type="radio" name="education" id="edu_1" value="1"><label for="edu_1">Less than a high school diploma</label><br>
+        <input type="radio" name="education" id="edu_2" value="2"><label for="edu_2">High school degree or equivalent (e.g. GED)</label><br>
+        <input type="radio" name="education" id="edu_3" value="3"><label for="edu_3">Some college, no degree</label><br>
+        <input type="radio" name="education" id="edu_4" value="4"><label for="edu_4">Associate degree (e.g. AA, AS)</label><br>
+        <input type="radio" name="education" id="edu_5" value="5"><label for="edu_5">Bachelor’s degree (e.g. BA, BS)</label><br>
+        <input type="radio" name="education" id="edu_6" value="6"><label for="edu_6">Master’s degree (e.g. MA, MS, MEd)</label><br>
+        <input type="radio" name="education" id="edu_7" value="7"><label for="edu_7">Professional degree (e.g. MD, DDS, DVM)</label><br>
+        <input type="radio" name="education" id="edu_8" value="8"><label for="edu_8">Doctorate (e.g. PhD, EdD)</label><br>
     </p><p>
         <label for="language">What is the first language you learned to speak? (leave blank if you choose not to specify)</label><br>
         <input type="text" id="language" name="language"><br>
     </p>
     <input type="submit" value="Submit">
 </form>
+
+<h1 id="working" style="display:none">Generating questions...</h1>

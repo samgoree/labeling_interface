@@ -1,6 +1,8 @@
 # import_snapshots.py
 # creates a Django command to import snapshots into the db from a directory
-# the directory should be structured like the russell-1000 data
+# requires two arguments: directory and txt. txt should be the path to a file
+# where the first token on each line is the name of an image
+# directory should be the directory where those images are located
 
 from django.core.management.base import BaseCommand, CommandError
 from aesthetics_labeling.models import Image
@@ -15,19 +17,13 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('directory', type=str)
-        parser.add_argument('txt', type=str)
 
     def handle(self, *args, **options):
         directory = options['directory']
-        data_fpath = options['txt']
         if not os.path.exists(directory):
             raise IOError("The provided directory doesn't exist")
         images = []
-        data_lines = open(data_fpath).readlines()
-        print('Loading data file with {} lines.'.format(len(data_lines)))
-        for i,line in enumerate(data_lines[1:]):
-            data = line.split(' ')
-            image_fname = data[0]
+        for i,image_fname in enumerate(os.listdir(directory)):
             image_path = os.path.join(directory, image_fname)
             if os.path.exists(image_path):
                 images.append(Image(image_path=image_path))

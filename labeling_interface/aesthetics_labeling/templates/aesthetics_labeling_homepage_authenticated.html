@@ -1,11 +1,11 @@
 <p>Welcome to the Computational Aesthetics Labeling Interface!</p>
 
-<p>Logged in as {{user.get_username }}. <a href="~sgoree/django.cgi/accounts/logout/"
+<p>Logged in as {{user.get_username }}.</p>
+<p><a href="/~sgoree/django.cgi/aesthetics_labeling/demographics">Edit personal information</a></p>
+<p><a href="/~sgoree/django.cgi/accounts/logout">Logout</a></p>
 
 {% if most_recent_question %}
-<p><a href="~sgoree/django.cgi/aesthetics_labeling/{{ most_recent_question.id }}/">Continue</a></p>
+<p><a href="/~sgoree/django.cgi/aesthetics_labeling/{{ most_recent_question.id }}/">Continue</a></p>
 {% else %}
-<p>You're all done!</p>
+<p>No assigned questions. You're all done!</p>
 {% endif %}
-
-<p>

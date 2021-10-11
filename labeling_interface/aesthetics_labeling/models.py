@@ -57,8 +57,13 @@ class Participant(AbstractUser):
     education = models.IntegerField(choices=edu_choices, default=NO_RESPONSE)
     language = models.TextField()
 
-    USERNAME_FIELD = 'id'
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+    
+    def __str__(self):
+        return ('Participant, id:'+  str(self.id) 
+                + ', email: ' + str(self.email)
+        )
 
     
 class ComparisonAssignment(models.Model):
@@ -67,6 +72,9 @@ class ComparisonAssignment(models.Model):
     """
     assigned_participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
     comparison = models.ForeignKey(Comparison, on_delete=models.CASCADE)
+    start_time = models.DateTimeField(null=True)
+    finish_time = models.DateTimeField(null=True)
+    reverse = models.BooleanField(default=False)
     
     UNLABELED = 0
     A_BETTER = 1
@@ -84,3 +92,9 @@ class ComparisonAssignment(models.Model):
     ]
 
     label = models.IntegerField(choices=choices, default=UNLABELED)
+    
+    def __str__(self):
+        return ('ComparisonAssignment, id:' + str(self.id) 
+                + ', assigned participant id: ' + str(self.assigned_participant.id)
+                + ', label:' + ComparisonAssignment.choices[self.label][1]
+        )

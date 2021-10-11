@@ -20,12 +20,15 @@ from django.contrib.auth import views as auth_views
 
 import aesthetics_labeling.views as views
 import labeling_interface.settings as settings
+from labeling_interface.settings import RELATIVE_BASE_URL
 
 urlpatterns = [
-    path(settings.BASE_URL + 'admin/', admin.site.urls),
-    path(settings.BASE_URL + '', views.index),
-    path(settings.BASE_URL + 'aesthetics_labeling/', views.aesthetics_labeling_homepage),
-    path(settings.BASE_URL + 'aesthetics_labeling/demographics', views.demographics),
-    path(settings.BASE_URL + 'aesthetics_labeling/<int:comparison_id>/', views.comparison, name='comparison'),
-    path(settings.BASE_URL + 'accounts/login', auth_views.LoginView.as_view(), name='login')
-] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path(RELATIVE_BASE_URL + 'admin/', admin.site.urls),
+    path(RELATIVE_BASE_URL + '', views.index),
+    path(RELATIVE_BASE_URL + 'aesthetics_labeling/', views.aesthetics_labeling_homepage),
+    path(RELATIVE_BASE_URL + 'aesthetics_labeling/demographics', views.demographics),
+    path(RELATIVE_BASE_URL + 'aesthetics_labeling/email_in_use', views.email_in_use),
+    path(RELATIVE_BASE_URL + 'aesthetics_labeling/<int:comparison_id>/', views.comparison, name='comparison'),
+    path(RELATIVE_BASE_URL + 'accounts/login', auth_views.LoginView.as_view(), name='login'),
+    path(RELATIVE_BASE_URL + 'accounts/logout', auth_views.LogoutView.as_view())
+] + static(RELATIVE_BASE_URL + 'aesthetics_labeling/media/', document_root = settings.MEDIA_ROOT) + static(RELATIVE_BASE_URL + 'aesthetics_labeling/static/', document_root=settings.STATIC_ROOT)
