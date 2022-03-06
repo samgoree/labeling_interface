@@ -10,7 +10,6 @@ class Image(models.Model):
     represents a single image of a website
     """
     image_path = models.CharField(max_length=200)
-    #tags = models.CharField(max_length=max(NUM_TAGS, 1), validators=[validate_comma_separated_integer_list])
     broken = models.BooleanField(default=False)
 
 class Comparison(models.Model):
@@ -24,38 +23,10 @@ class Comparison(models.Model):
     assigned = models.BooleanField(default=False)
     
 class Participant(AbstractUser):
-    NO_RESPONSE = 0
-    YES = 1
-    NO = 2
-    
-    age_choices = [
-        (1, 'Under 18'),
-        (2, '18-24 years old'),
-        (3, '25-34 years old'),
-        (4, '35-44 years old'),
-        (5, '45-54 years old'),
-        (6, '55 years old or older')
-    ]
-    edu_choices = [
-        (NO_RESPONSE, 'Choose not to specify'),
-        (1, 'Less than a high school diploma'),
-        (2, 'High school degree or equivalent (e.g. GED)'),
-        (3, 'Some college, no degree'),
-        (4, 'Associate degree (e.g. AA, AS)'),
-        (5, 'Bachelor’s degree (e.g. BA, BS)'),
-        (6, 'Master’s degree (e.g. MA, MS, MEd)'),
-        (7, 'Professional degree (e.g. MD, DDS, DVM)'),
-        (8, 'Doctorate (e.g. PhD, EdD)')
-    ]
     
     username = None
     email = models.EmailField('email address', unique=True)
     ip = models.TextField()
-    #age = models.IntegerField(choices=age_choices, default=1)
-    #gender = models.TextField()
-    #race = models.TextField()
-    #education = models.IntegerField(choices=edu_choices, default=NO_RESPONSE)
-    #language = models.TextField()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -79,7 +50,7 @@ class TextQuestionResponse(models.Model):
     
 class ComparisonAssignment(models.Model):
     """
-    assign a comparison to a participant
+    represents an assignment of a comparison to a participant
     """
     
     class Meta:

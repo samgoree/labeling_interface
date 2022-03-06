@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(uv81le2hmvuun^%9#25cv8_tr_7x34s_x6k*d@@r#agv&85zx'
+SECRET_KEY = None # fill this in on your own
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -126,7 +126,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-BASE_URL = '~sgoree/django.cgi/'
+BASE_URL = '' # fill in your site's url
 RELATIVE_BASE_URL = ''
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'aesthetics_labeling/static/')
