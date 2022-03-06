@@ -1,11 +1,15 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
+
+<div class="col-sm col-md-10 col-md-offset-1">
 <p>Welcome to the Computational Aesthetics Labeling Interface!</p>
 
 <p>Logged in as {{user.get_username }}.</p>
-<p><a href="/~sgoree/django.cgi/aesthetics_labeling/demographics">Edit personal information</a></p>
 <p><a href="/~sgoree/django.cgi/accounts/logout">Logout</a></p>
 
 {% if most_recent_question %}
 <p><a href="/~sgoree/django.cgi/aesthetics_labeling/{{ most_recent_question.id }}/">Continue</a></p>
 {% else %}
 <p>No assigned questions. You're all done!</p>
+<p><a href="/~sgoree/django.cgi/aesthetics_labeling/request_additional/">Request Additional Pairs</a> (just for fun! This won't make you eligible for an additional gift card.)</p>
 {% endif %}
+<div class="col-sm col-md-10 col-md-offset-1">

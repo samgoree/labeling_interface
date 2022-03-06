@@ -1,3 +1,12 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
+<script src="https://www.google.com/recaptcha/api.js"></script>
+<script>
+   function onSubmit(token) {
+      document.getElementById("submitbutton").style.background='#949494';
+      document.getElementById("loginform").submit();
+   }
+</script>
+
 {% block content %}
 
 {% if form.errors %}
@@ -13,23 +22,42 @@
   {% endif %}
 {% endif %}
 
-<form method="post" action="{% url 'login' %}">
-{% csrf_token %}
-<table>
+<div class="container">
+    <div class="row">
+        <p>Thank you for participating in our research study! We are collecting data on human aesthetic preferences for photographs. First, we will ask you for your email again, to link your responses to the screening survey, followed by a series of 100 questions about pairs of images. The questions will take between 20 and 40 minutes to complete. After completion, we will email you a link to a $10 Amazon gift card to compensate you for your time, hopefully in the next few weeks.</p>
+        <p>We have some measures in place to prevent malicious users from completing our survey multiple times with different email addresses, and reserve the right to deny gift cards to anyone who attempts to misuse our platform. If we are concerned about your submission, we will email you about it.</p>
+        <p>We apologize, our website is quite slow, so you may have to wait several seconds for each page. If you encounter any other technical issues, please let us know.</p>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+        </div>
+        <div class="col-sm-12 col-md-8 col-lg-6">
+            <form id="loginform" method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="input-group fluid">
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                </div>
 
-<tr>
-  <td>{{ form.username.label_tag }}</td>
-  <td>{{ form.username }}</td>
-</tr>
+                <div class="input-group fluid">
+                  {{ form.password.label_tag }}
+                  {{ form.password }}
+                </div>
 
-<tr>
-  <td>{{ form.password.label_tag }}</td>
-  <td>{{ form.password }}</td>
-</tr>
-</table>
-
-<input type="submit" value="login" />
-<input type="hidden" name="next" value="{{ next }}" />
-</form>
+                <div class="input-group fluid">
+                <button id="submitbutton" type="submit" value="Submit" class="g-recaptcha" 
+                    data-sitekey="6LeQZiodAAAAAFnK-YZwJk3vaRdKn0hUEv62_9II" 
+                    data-callback='onSubmit' 
+                    data-action='submit'>Login
+                </button>
+                </div>
+                <input type="hidden" name="next" value="{{ next }}" />
+            </form>
+        </div>
+        <div class="col-sm">
+        </div>
+    </div>
+</div>
+    
 
 {% endblock %}

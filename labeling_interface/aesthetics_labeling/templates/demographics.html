@@ -1,17 +1,30 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
+<script src="https://www.google.com/recaptcha/api.js"></script>
+<script>
+   function onSubmit(token) {
+      document.getElementById("demoform").submit();
+   }
+</script>
+
+<div class="col-sm col-md-10 col-md-offset-1">
 <h1>Aesthetic Preference Survey</h1>
-<p>Thank you for participating in our research study! We are collecting data on human aesthetic preferences for photographs. First, we will ask you a series of six demographic questions, followed by a series of 100 questions about pairs of images. This survey will take between 30 and 90 minutes to complete. Upon completion, we will email you a link to a $15 Amazon gift card to compensate you for your time.</p>
-<form method="POST" onsubmit="document.getElementById('working').style.display = 'inline';">
+<p>Thank you for participating in our research study! We are collecting data on human aesthetic preferences for photographs. First, we will ask you for your email again, to link your responses to the screening survey, followed by a series of 100 questions about pairs of images. The questions will take between 20 and 40 minutes to complete. After completion, we will email you a link to a $10 Amazon gift card to compensate you for your time, hopefully in the next few weeks.</p>
+
+<p>We have some measures in place to prevent malicious users from completing our survey multiple times, and reserve the right to deny gift cards to anyone who attempts to misuse our platform.</p>
+
+<form id="demoform" method="POST">
     {% csrf_token %}
     {% if not user.is_authenticated %}
-    <p> <label for="email">Please provide your email address so that we can send you your gift card: </label>
+    <p> <label for="email">Please enter your email address: </label>
         <input type="text" id="email" name="email" required> (required) <br>
     </p>
-    <p> <label for="password">Please create a password so you can log in and continue if you leave.</label>
+    <p> <label for="password">Please enter the password we sent you:</label>
         <input type="password" id="password" name="password" required> (required) <br>
     </p>
     {% else %}
-    <p>Resubmitting information for {{user.email}}</p>
+    <p>Logged in as {{user.email}}</p>
     {% endif %}
+    {% comment %}
     <p>
         <label for="age">What is your age? (required)</label><br>
         <input type="radio" name="age" id="Under 18" value=1 required><label for="Under 18">Under 18</label><br>
@@ -50,7 +63,16 @@
         <label for="language">What is the first language you learned to speak? (leave blank if you choose not to specify)</label><br>
         <input type="text" id="language" name="language"><br>
     </p>
-    <input type="submit" value="Submit">
+    {% endcomment %}
+    
+    <button type="submit" value="Submit" class="g-recaptcha" 
+        data-sitekey="6LeQZiodAAAAAFnK-YZwJk3vaRdKn0hUEv62_9II" 
+        data-callback='onSubmit' 
+        data-action='submit'>Submit
+    </button>
 </form>
 
-<h1 id="working" style="display:none">Generating questions...</h1>
+<p><a href="/~sgoree/django.cgi/aesthetics_labeling/informed_consent">View consent form</a></p>
+<p><a href="/~sgoree/django.cgi/aesthetics_labeling/">Back</a></p>
+
+</div>

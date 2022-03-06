@@ -1,22 +1,34 @@
 import os
 import subprocess
-import random
+from random import randint, shuffle
 import datetime
-
+import requests
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import loader
 from django.db.models import Q
 
-from aesthetics_labeling.models import Comparison, Participant, ComparisonAssignment
+from aesthetics_labeling.models import Comparison, Participant, ComparisonAssignment, TextQuestionResponse
 from aesthetics_labeling.constants import TAGS
 from labeling_interface.settings import BASE_DIR, BASE_URL
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login
+from django.contrib.auth import authenticate, login, REDIRECT_FIELD_NAME
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.response import TemplateResponse
+from django.utils.http import is_safe_url
 
 UNIQUE_IMAGES_PER_PERSON = 80
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 def index(request):
     template = loader.get_template('index.html')
@@ -24,6 +36,14 @@ def index(request):
 
 def email_in_use(request):
     template = loader.get_template('email_in_use.html')
+    return HttpResponse(template.render({}, request))
+
+def underage(request):
+    template = loader.get_template('underage.html')
+    return HttpResponse(template.render({}, request))
+
+def informed_consent(request):
+    template = loader.get_template('informed_consent.html')
     return HttpResponse(template.render({}, request))
 
 def prep_image(image_path):
@@ -57,56 +77,27 @@ def handle_submission(request, comparison_id):
     comparison_assignment.label = int(data['comparison_result'])
     if 'image_a_broken' in data:
         comparison.image_a.broken = True
-        remove_broken_image(comparison.image_a)
+        #remove_broken_image(comparison.image_a)
     if 'image_b_broken' in data:
         comparison.image_b.broken = True
-        remove_broken_image(comparison.image_b)
+        #remove_broken_image(comparison.image_b)
     comparison_assignment.save()
 
-def get_next_question(user):
-    queryset = ComparisonAssignment.objects.filter(
-        label=ComparisonAssignment.UNLABELED,
-        assigned_participant=user,
-    ).order_by('id')
+def get_next_question(user, assignments=None):
+    if assignments is None:
+        queryset = ComparisonAssignment.objects.filter(
+            label=ComparisonAssignment.UNLABELED,
+            assigned_participant=user,
+        ).order_by('id')
+    else:
+        queryset = assignments.filter(
+            label=ComparisonAssignment.UNLABELED
+        ).order_by('id')
     if queryset.count() > 0:
         return queryset[0].comparison
     else:
         return None
     
-def create_user(data):
-    if 'gender' in data:
-        gender = data['gender']
-    else:
-        gender = ''
-    if 'race' in data:
-        race = data['race']
-    else:
-        race = ''
-    if 'education' in data:
-        education = data['education']
-    else:
-        education = 0
-    if 'language' in data:
-        language = data['language']
-    else:
-        language = ''
-    
-    
-    user = Participant(
-        email = data['email'],
-        age = int(data['age']),
-        gender = gender,
-        race = race,
-        education = int(education),
-        language = language
-    )
-    user.set_password(data['password'])
-    user.save()
-    
-    assign_images(user)
-    
-    return user
-
 def assign_images(user, common=True, unique=True):
     # assign some common image pairs
     assignments = []
@@ -114,9 +105,9 @@ def assign_images(user, common=True, unique=True):
         common_image_pairs = list(Comparison.objects.filter(
             common=True
         ).all())
-        random.shuffle(common_image_pairs)
+        shuffle(common_image_pairs)
         for pair in common_image_pairs:
-            reverse = (random.randint(0,1) == 1)
+            reverse = (randint(0,1) == 1)
             assignment = ComparisonAssignment(
                 assigned_participant=user,
                 comparison=pair,
@@ -144,7 +135,7 @@ def assign_images(user, common=True, unique=True):
             assignments.append(assignment)
     ComparisonAssignment.objects.bulk_create(assignments)
 
-def update_user(user, data):
+"""def update_user(user, data):
     if 'gender' in data:
         user.gender = data['gender']
     else:
@@ -161,7 +152,7 @@ def update_user(user, data):
         user.language = data['language']
     else:
         user.language = ''
-    user.save()
+    user.save()"""
     
 def aesthetics_labeling_homepage(request):
     """
@@ -177,14 +168,19 @@ def aesthetics_labeling_homepage(request):
         template = loader.get_template('aesthetics_labeling_homepage_default.html')
         return HttpResponse(template.render({}, request))
     
-def demographics(request):
+def request_additional(request):
+    assign_images(request.user, common=False, unique=True)
+    next_question = get_next_question(request.user)
+    return redirect('/' + BASE_URL + 'aesthetics_labeling/' + str(next_question.id))
+    
+"""def demographics(request):
     if request.method == 'GET':
         template = loader.get_template('demographics.html')
         return HttpResponse(template.render({}, request))
     elif request.method == 'POST':
         if 'email' not in request.POST:
             # we're editing an existing user's data
-            update_user(request.user, request.POST)
+            #update_user(request.user, request.POST)
             next_question = get_next_question(request.user)
             if next_question is None:
                 return redirect('/' + BASE_URL + 'aesthetics_labeling/')
@@ -195,7 +191,18 @@ def demographics(request):
             return redirect('/' + BASE_URL + 'aesthetics_labeling/email_in_use')
         else:
             # create the new user account
-            user = create_user(request.POST)
+            resp = requests.post(
+                'https://www.google.com/recaptcha/api/siteverify',
+                 data = {
+                     'secret':'6LeQZiodAAAAAIGRcQLQuOehXwHTXcLf8BQqCjC8',
+                     'response':request.POST['g-recaptcha-response']
+                 }
+                )
+            if not str(resp.json()['success']):
+                return redirect('/' + BASE_URL + 'aesthetics_labeling/')
+            #if request.POST['age'] == '1':
+                #return redirect('/' + BASE_URL + 'aesthetics_labeling/underage')
+            user = create_user(request)
             # login to the new account
             login(request, user)
             # redirect to the next question
@@ -204,7 +211,74 @@ def demographics(request):
                 return redirect('/' + BASE_URL + 'aesthetics_labeling/')
             else:
                 return redirect('/' + BASE_URL + 'aesthetics_labeling/' + str(next_question.id))
+"""
 
+def login_view(request):
+    if request.method == 'GET':
+        form = AuthenticationForm(request)
+        redirect_to = request.POST.get(REDIRECT_FIELD_NAME,
+                                   request.GET.get(REDIRECT_FIELD_NAME, ''))
+        current_site = get_current_site(request)
+        context = {
+            'form': form,
+            REDIRECT_FIELD_NAME: redirect_to,
+            'site': current_site,
+            'site_name': current_site.name,
+        }
+        return TemplateResponse(request, 'registration/login.html', context)
+    elif request.method == 'POST':
+        
+        resp = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+             data = {
+                 'secret':'6LeQZiodAAAAAIGRcQLQuOehXwHTXcLf8BQqCjC8',
+                 'response':request.POST['g-recaptcha-response']
+             }
+            )
+        if not str(resp.json()['success']):
+            return redirect('/' + BASE_URL + 'aesthetics_labeling/')
+        
+        username = request.POST['username']
+        password = request.POST['password']
+        form = AuthenticationForm(request, data=request.POST)
+        redirect_to = request.POST.get(REDIRECT_FIELD_NAME, request.GET.get(REDIRECT_FIELD_NAME, ''))
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            user.ip = get_client_ip(request)
+            user.save()
+            next_question = get_next_question(user)
+            if next_question is None:
+                return redirect('/' + BASE_URL + 'aesthetics_labeling/')
+            else:
+                return redirect('/' + BASE_URL + 'aesthetics_labeling/' + str(next_question.id))
+        else:
+            form = AuthenticationForm(request)
+            current_site = get_current_site(request)
+            context = {
+                'form': form,
+                REDIRECT_FIELD_NAME: redirect_to,
+                'site': current_site,
+                'site_name': current_site.name,
+            }
+            return TemplateResponse(request, 'registration/login.html', context)
+        
+        
+
+def image(request, static_path):
+    if static_path[-5:] == '.jpeg' or static_path[-4:] == '.jpg':
+        try:
+            with open(os.path.join(BASE_DIR, 'aesthetics_labeling/static/', static_path), "rb") as f:
+                return HttpResponse(f.read(), content_type="image/jpeg")
+        except IOError:
+            red = Image.new('RGBA', (1, 1), (255,0,0,0))
+            response = HttpResponse(content_type="image/jpeg")
+            red.save(response, "JPEG")
+            return response
+    elif static_path == 'js/comparison.js':
+        with open('aesthetics_labeling/static/js/comparison.js', 'r') as f:
+            return HttpResponse(f.read(), content_type='text/js')
+            
 @login_required
 def comparison(request, comparison_id):
     # If this is a GET, send back a page
@@ -227,10 +301,10 @@ def comparison(request, comparison_id):
             remove_broken_image(comparison.image_b)
             comparison.save()
         if image_a_path is None or image_b_path is None:
-            next_question = get_next_question()
+            next_question = get_next_question(request.user, assignments)
             return redirect('/aesthetics_labeling/' + str(next_question.id))
         
-        possible_comparison_assignments = ComparisonAssignment.objects.filter(comparison=comparison, assigned_participant=request.user, finish_time__isnull=True)
+        possible_comparison_assignments = assignments.filter(comparison=comparison)
         if len(possible_comparison_assignments) == 0:
             comparison_assignment = ComparisonAssignment(
                 assigned_participant=request.user, 
@@ -262,6 +336,47 @@ def comparison(request, comparison_id):
     # if this is a POST process the data and redirect to the next page
     elif request.method == 'POST':
         handle_submission(request, comparison_id)
+        # figure out if we're headed to the question page
+        assignments = ComparisonAssignment.objects.filter(assigned_participant=request.user)
+        n_completed = assignments.exclude(label=ComparisonAssignment.UNLABELED).count()
+        if n_completed > 50:
+            questions_answered = (TextQuestionResponse.objects.filter(user=request.user).count() > 0)
+            if not questions_answered:
+                return redirect('/' + BASE_URL + 'aesthetics_labeling/text_questions')
+        next_question = get_next_question(request.user, assignments)
+        if next_question is None:
+            return redirect('/' + BASE_URL + 'aesthetics_labeling/')
+        else:
+            return redirect('/' + BASE_URL + 'aesthetics_labeling/' + str(next_question.id))
+
+@login_required
+def text_questions(request):
+    if request.method == 'GET':
+        template = loader.get_template('text_questions.html')
+        return HttpResponse(template.render({}, request))
+    elif request.method == 'POST':
+        resp = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+             data = {
+                 'secret':'6LeQZiodAAAAAIGRcQLQuOehXwHTXcLf8BQqCjC8',
+                 'response':request.POST['g-recaptcha-response']
+             }
+            )
+        if not str(resp.json()['success']):
+            return redirect('/' + BASE_URL + 'aesthetics_labeling/')
+        
+        # make a db entry
+        tqr = TextQuestionResponse(
+            question_1=request.POST['q1'],
+            question_2=request.POST['q2'],
+            question_3=request.POST['q3'],
+            question_4=request.POST['q4'],
+            user=request.user,
+            completion_time = datetime.datetime.now(),
+            ip=get_client_ip(request)
+        )
+        tqr.save()
+        
         next_question = get_next_question(request.user)
         if next_question is None:
             return redirect('/' + BASE_URL + 'aesthetics_labeling/')

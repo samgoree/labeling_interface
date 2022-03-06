@@ -22,8 +22,7 @@ class Comparison(models.Model):
     image_b = models.ForeignKey(Image, on_delete=models.CASCADE, related_name='comparison_as_b')
     common = models.BooleanField(default=False) # common to all participants
     assigned = models.BooleanField(default=False)
-
-
+    
 class Participant(AbstractUser):
     NO_RESPONSE = 0
     YES = 1
@@ -51,11 +50,12 @@ class Participant(AbstractUser):
     
     username = None
     email = models.EmailField('email address', unique=True)
-    age = models.IntegerField(choices=age_choices, default=1)
-    gender = models.TextField()
-    race = models.TextField()
-    education = models.IntegerField(choices=edu_choices, default=NO_RESPONSE)
-    language = models.TextField()
+    ip = models.TextField()
+    #age = models.IntegerField(choices=age_choices, default=1)
+    #gender = models.TextField()
+    #race = models.TextField()
+    #education = models.IntegerField(choices=edu_choices, default=NO_RESPONSE)
+    #language = models.TextField()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -65,11 +65,28 @@ class Participant(AbstractUser):
                 + ', email: ' + str(self.email)
         )
 
+class TextQuestionResponse(models.Model):
+    """
+    free text responses from participants
+    """
+    question_1 = models.TextField()
+    question_2 = models.TextField()
+    question_3 = models.TextField()
+    question_4 = models.TextField()
+    user = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='text_question_response')
+    ip = models.TextField()
+    completion_time = models.DateTimeField(null=True)
     
 class ComparisonAssignment(models.Model):
     """
     assign a comparison to a participant
     """
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['assigned_participant', 'comparison'])
+        ]
+    
     assigned_participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
     comparison = models.ForeignKey(Comparison, on_delete=models.CASCADE)
     start_time = models.DateTimeField(null=True)

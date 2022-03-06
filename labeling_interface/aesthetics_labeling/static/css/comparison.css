@@ -1,12 +1,12 @@
 .center {
-  display: block;
+  display: grid;
   margin-left: auto;
   margin-right: auto;
 }
 
 img.center {
-  height: 500px;
-  width: auto;
+  max-height: 500px;
+  max-width: 100%;
 }
 
 .row {

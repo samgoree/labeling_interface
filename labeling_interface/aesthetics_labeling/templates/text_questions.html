@@ -1,0 +1,47 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
+<script src="https://www.google.com/recaptcha/api.js"></script>
+<script>
+   function onSubmit(token) {
+       var issues = false;
+       if(document.getElementById("q1").value==''){
+           document.getElementById("p1").innerHTML = " <b>(required)</b>";
+           issues=true;
+       }
+       if(document.getElementById("q2").value==''){
+           document.getElementById("p2").innerHTML = " <b>(required)</b>";
+           issues=true;
+       }
+       if(document.getElementById("q3").value==''){
+           document.getElementById("p3").innerHTML = " <b>(required)</b>";
+           issues=true;
+       }
+       if(issues){
+           return false;
+       }
+       document.getElementById("submitbutton").style.background='#949494';
+      document.getElementById("qualitativeform").submit();
+   }
+</script>
+<div class="col-sm col-md-10 col-md-offset-1">
+    <h3>Quick Break: please answer the following questions:</h3>
+    <form id="qualitativeform" method="POST">
+        {% csrf_token %}
+        <p>how many choices are you given for each image pair? (just write a number. We're using this question to check for bot responses, if you answer strangely, you may not get paid.)</p>
+        <p id='p1'></p>
+        <textarea id="q1" name="q1" rows="4" cols="50" required></textarea>
+        <p>How are you choosing between images?</p>
+        <p id='p2'></p>
+        <textarea id="q2" name="q2" rows="4" cols="50" required></textarea>
+        <p>Do you find yourself relying more on the content of the images (like the objects or people pictured) or the style (like whether the picture is blurry or if it is colorful)?</p>
+        <p id='p3'></p>
+        <textarea id="q3" name="q3" rows="4" cols="50" required></textarea>
+        <p id='p4'>Do you have any questions or comments for us?</p>
+        <textarea id="q4" name="q4" rows="4" cols="50"></textarea>
+        <button id="submitbutton" type="submit" value="Submit" class="g-recaptcha" 
+            data-sitekey="6LeQZiodAAAAAFnK-YZwJk3vaRdKn0hUEv62_9II" 
+            data-callback='onSubmit' 
+            data-action='submit'>Continue
+        </button>
+    </form>
+    
+</div>
