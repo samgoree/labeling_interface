@@ -172,46 +172,6 @@ def request_additional(request):
     assign_images(request.user, common=False, unique=True)
     next_question = get_next_question(request.user)
     return redirect('/' + BASE_URL + 'aesthetics_labeling/' + str(next_question.id))
-    
-"""def demographics(request):
-    if request.method == 'GET':
-        template = loader.get_template('demographics.html')
-        return HttpResponse(template.render({}, request))
-    elif request.method == 'POST':
-        if 'email' not in request.POST:
-            # we're editing an existing user's data
-            #update_user(request.user, request.POST)
-            next_question = get_next_question(request.user)
-            if next_question is None:
-                return redirect('/' + BASE_URL + 'aesthetics_labeling/')
-            else:
-                return redirect('/' + BASE_URL + 'aesthetics_labeling/' + str(next_question.id))
-            
-        elif len(Participant.objects.filter(email=request.POST['email'])) > 0:
-            return redirect('/' + BASE_URL + 'aesthetics_labeling/email_in_use')
-        else:
-            # create the new user account
-            resp = requests.post(
-                'https://www.google.com/recaptcha/api/siteverify',
-                 data = {
-                     'secret':'6LeQZiodAAAAAIGRcQLQuOehXwHTXcLf8BQqCjC8',
-                     'response':request.POST['g-recaptcha-response']
-                 }
-                )
-            if not str(resp.json()['success']):
-                return redirect('/' + BASE_URL + 'aesthetics_labeling/')
-            #if request.POST['age'] == '1':
-                #return redirect('/' + BASE_URL + 'aesthetics_labeling/underage')
-            user = create_user(request)
-            # login to the new account
-            login(request, user)
-            # redirect to the next question
-            next_question = get_next_question(user)
-            if next_question is None:
-                return redirect('/' + BASE_URL + 'aesthetics_labeling/')
-            else:
-                return redirect('/' + BASE_URL + 'aesthetics_labeling/' + str(next_question.id))
-"""
 
 def login_view(request):
     if request.method == 'GET':
@@ -231,7 +191,7 @@ def login_view(request):
         resp = requests.post(
             'https://www.google.com/recaptcha/api/siteverify',
              data = {
-                 'secret':'6LeQZiodAAAAAIGRcQLQuOehXwHTXcLf8BQqCjC8',
+                 'secret':'your_secret_key',
                  'response':request.POST['g-recaptcha-response']
              }
             )
@@ -358,7 +318,7 @@ def text_questions(request):
         resp = requests.post(
             'https://www.google.com/recaptcha/api/siteverify',
              data = {
-                 'secret':'6LeQZiodAAAAAIGRcQLQuOehXwHTXcLf8BQqCjC8',
+                 'secret':'your_secret_key',
                  'response':request.POST['g-recaptcha-response']
              }
             )
